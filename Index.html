@@ -1,0 +1,894 @@
+<title>Deepavali Potluck RSVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: two panes — sign-up form on the left, live food board on the right; stacks to one column on phones */
+/* Deliberately dark-only: black ground in every theme. Themes swap the accent pair and tint the neutrals.
+   --leaf = primary (buttons, "covered", selected), --marigold = secondary (bars, labels, notices) */
+:root{
+  /* Diya Gold (default) */
+  --bg:#0a0907; --surface:#15130f; --sunk:#1f1c16; --field:#100e0b;
+  --ink:#f3ede2; --muted:#a59c8c; --line:#2e2a22;
+  --leaf:#e8b443; --leaf-ink:#1a1305; --leaf-soft:#2d2512;
+  --marigold:#ff8a3d; --marigold-ink:#ffa466; --marigold-soft:#2e1d10;
+  --glow:rgba(232,180,67,.16);
+  --veg:#4cc274; --nonveg:#ef6a52; --danger:#ff7a63;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme:dark;
+}
+:root[data-palette="rangoli"]{
+  --bg:#0b080a; --surface:#161115; --sunk:#21181f; --field:#100c0f;
+  --ink:#f5ebf1; --muted:#a8969f; --line:#30242c;
+  --leaf:#ff4f9a; --leaf-ink:#1c0610; --leaf-soft:#33152a;
+  --marigold:#f6c344; --marigold-ink:#f8cf62; --marigold-soft:#2c2412;
+  --glow:rgba(255,79,154,.15);
+}
+:root[data-palette="peacock"]{
+  --bg:#060a0b; --surface:#0f1517; --sunk:#172024; --field:#0b1012;
+  --ink:#e6f1f1; --muted:#8fa3a6; --line:#223034;
+  --leaf:#2ec4b6; --leaf-ink:#03201d; --leaf-soft:#123230;
+  --marigold:#7f9cff; --marigold-ink:#9db3ff; --marigold-soft:#172038;
+  --glow:rgba(46,196,182,.15);
+}
+:root[data-palette="kumkum"]{
+  --bg:#0b0707; --surface:#170f0f; --sunk:#221616; --field:#100a0a;
+  --ink:#f6e9e6; --muted:#ab9893; --line:#33221f;
+  --leaf:#ff5a4e; --leaf-ink:#200605; --leaf-soft:#381714;
+  --marigold:#f2b84b; --marigold-ink:#f5c76c; --marigold-soft:#2d2413;
+  --glow:rgba(255,90,78,.15);
+}
+:root[data-palette="leaf"]{
+  --bg:#070a08; --surface:#111813; --sunk:#19231c; --field:#0c110e;
+  --ink:#e7eee8; --muted:#94a69a; --line:#26342b;
+  --leaf:#79c497; --leaf-ink:#0d1a12; --leaf-soft:#1c3125;
+  --marigold:#f0b23a; --marigold-ink:#f3c062; --marigold-soft:#2c2414;
+  --glow:rgba(121,196,151,.13);
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{background-image:radial-gradient(1100px 420px at 15% -120px, var(--glow), transparent 70%);background-repeat:no-repeat}
+
+/* Theme picker */
+.themes{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.themes .tl{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-right:4px}
+.sw{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;padding:6px 12px 6px 6px;border-radius:999px;cursor:pointer;flex:none}
+.sw:hover{border-color:var(--muted)}
+.sw[aria-pressed=true]{border-color:var(--leaf);box-shadow:0 0 0 1px var(--leaf)}
+.sw .dots{display:flex}
+.sw .dots i{width:16px;height:16px;border-radius:50%;border:2px solid var(--surface)}
+.sw .dots i + i{margin-left:-6px}
+body{margin:0;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 96px}
+@media (max-width:480px){.wrap{padding-inline:16px}}
+
+.preview{display:flex;gap:10px;align-items:center;background:var(--marigold-soft);color:var(--marigold-ink);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;margin-bottom:18px}
+
+header.top{display:grid;gap:12px;padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:26px;position:relative}
+header.top > *:not(.art){position:relative;z-index:1}
+@media (min-width:881px){ header.top .eyebrow, header.top h1, header.top .meta{max-width:calc(100% - 400px)} }
+
+/* Deepavali art: kolam + agal vilakku + mathappu, top right */
+.art{position:absolute;top:-18px;right:0;width:min(440px,46%);pointer-events:none;z-index:0}
+.art svg{display:block;width:100%;height:auto;overflow:visible}
+.art .k{fill:none;stroke:var(--ink);stroke-opacity:.55;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.art .pA{fill:var(--marigold);fill-opacity:.22}
+.art .pB{fill:var(--leaf);fill-opacity:.28}
+.art .pC{fill:var(--leaf);fill-opacity:.5}
+.art .dot{fill:var(--ink);fill-opacity:.75}
+.art .spark{stroke:var(--marigold);stroke-width:1.5;stroke-linecap:round;fill:none}
+.art .spark circle{fill:var(--leaf);stroke:none}
+.art .flame{transform-box:fill-box;transform-origin:50% 100%;animation:flick 1.6s ease-in-out infinite alternate}
+.art .glowc{animation:breathe 2.4s ease-in-out infinite alternate}
+.art .spark{animation:twinkle 2.8s ease-in-out infinite}
+@keyframes flick{0%{transform:scale(1,1) skewX(0)}35%{transform:scale(.94,1.06) skewX(2deg)}70%{transform:scale(1.04,.95) skewX(-2deg)}100%{transform:scale(.97,1.04) skewX(1deg)}}
+@keyframes breathe{from{opacity:.75}to{opacity:1}}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.art *{animation:none!important}}
+@media (max-width:880px){
+  .art{width:230px;top:-10px;opacity:.5}
+  header.top h1{text-shadow:0 2px 12px var(--bg)}
+}
+@media (max-width:420px){ .art{width:190px;opacity:.42} }
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--marigold-ink);font-weight:700}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(32px,5.4vw,50px);line-height:1.05;margin:0;text-wrap:balance}
+.meta{color:var(--muted);margin:0}
+.stats{display:flex;flex-wrap:wrap;gap:10px 34px;margin-top:6px}
+.stat b{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;display:block;font-variant-numeric:tabular-nums}
+.stat span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+
+.grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+@media (max-width:480px){.panel{padding:16px}}
+@media (min-width:881px){.board{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);max-height:calc(100vh - 32px);overflow:auto}}
+
+h2{font-family:var(--display);font-weight:400;font-size:24px;line-height:1.2;margin:0}
+h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:700}
+.stack{display:grid;gap:16px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.hint{color:var(--muted);font-size:13px;margin:0}
+hr.div{border:0;border-top:1px solid var(--line);margin:8px 0}
+
+fieldset{border:0;margin:0;padding:0;min-width:0}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 14px}
+.fields .full{grid-column:1/-1}
+@media (max-width:540px){.fields{grid-template-columns:minmax(0,1fr)}}
+.f{display:grid;gap:6px;font-size:13px;font-weight:600;min-width:0}
+.f > .lbl{display:flex;justify-content:space-between;gap:8px}
+.f .opt{font-weight:500;color:var(--muted)}
+input[type=text],input[type=email],input[type=tel],input[type=number],select,textarea{
+  font:inherit;font-weight:500;color:var(--ink);background:var(--field);border:1px solid var(--line);
+  border-radius:10px;padding:9px 11px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:64px}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.75}
+:focus-visible{outline:2px solid var(--marigold);outline-offset:2px}
+input:focus,select:focus,textarea:focus{border-color:var(--marigold)}
+
+/* Segmented radios */
+.seg{display:flex;background:var(--sunk);border-radius:11px;padding:3px;gap:3px}
+.seg label{flex:1;position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 10px;border-radius:8px;font-size:14px;font-weight:600;color:var(--muted);transition:background .15s,color .15s;white-space:nowrap}
+.seg input:checked + span{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.seg input:focus-visible + span{outline:2px solid var(--marigold);outline-offset:1px}
+.seg.att input[value=Yes]:checked + span{background:var(--leaf);color:var(--leaf-ink)}
+
+/* Steppers */
+.stepper{display:grid;grid-template-columns:40px minmax(0,1fr) 40px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--field)}
+.stepper button{border:0;background:var(--sunk);color:var(--ink);font:inherit;font-size:18px;font-weight:600;cursor:pointer}
+.stepper button:hover{background:var(--leaf-soft)}
+.stepper input{border:0;border-radius:0;text-align:center;font-variant-numeric:tabular-nums;font-weight:700;-moz-appearance:textfield}
+.stepper input::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* Veg / non-veg marks (Indian food-label convention) */
+.vm{width:14px;height:14px;flex:none;border:1.6px solid var(--veg);border-radius:2px;display:inline-grid;place-items:center}
+.vm::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--veg)}
+.vm.nv{border-color:var(--nonveg)}
+.vm.nv::after{border-radius:0;width:7px;height:6px;background:var(--nonveg);clip-path:polygon(50% 0,100% 100%,0 100%)}
+
+/* Dish cards */
+.dishes{display:grid;gap:12px}
+.dish{border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:12px;background:var(--bg)}
+.dish-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dish-num{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--marigold-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;font-weight:600;padding:5px 11px;border-radius:999px;cursor:pointer}
+.chip:hover{border-color:var(--leaf)}
+.chip[aria-pressed=true]{background:var(--leaf);border-color:var(--leaf);color:var(--leaf-ink)}
+.chip .n{opacity:.7;font-variant-numeric:tabular-nums;margin-left:4px}
+.qty-row{display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr) auto;gap:10px;align-items:end}
+@media (max-width:480px){.qty-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.qty-row .serves{grid-column:1/-1}}
+.serves{font-size:13px;color:var(--muted);padding-bottom:9px;white-space:nowrap}
+.serves b{color:var(--ink);font-variant-numeric:tabular-nums}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:480px){.two{grid-template-columns:minmax(0,1fr)}}
+.dish[data-nospice] .spice{display:none}
+.dish[data-nospice] .two{grid-template-columns:minmax(0,1fr)}
+.dup{margin:0;font-size:13px;color:var(--marigold-ink);background:var(--marigold-soft);padding:7px 10px;border-radius:8px}
+.icon-btn{border:0;background:none;color:var(--muted);font:inherit;font-size:13px;font-weight:600;cursor:pointer;padding:4px 6px;border-radius:6px}
+.icon-btn:hover{color:var(--danger);background:var(--sunk)}
+.add{border:1.5px dashed var(--line);background:none;color:var(--leaf);font:inherit;font-weight:700;padding:12px;border-radius:12px;cursor:pointer;width:100%}
+.add:hover{border-color:var(--leaf);background:var(--leaf-soft)}
+.add:disabled{opacity:.5;cursor:not-allowed}
+.skip{padding:14px;border-radius:12px;background:var(--sunk);color:var(--muted);font-size:14px}
+
+/* Submit bar */
+.submit-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-top:6px}
+.summary{font-size:14px;color:var(--muted)}
+.summary b{color:var(--ink);font-variant-numeric:tabular-nums}
+.btn{border:0;background:var(--leaf);color:var(--leaf-ink);font:inherit;font-weight:700;font-size:15px;padding:12px 22px;border-radius:11px;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.6;cursor:progress}
+.err{margin:0;color:var(--danger);font-size:14px;font-weight:600}
+
+details.edit{background:var(--sunk);border-radius:11px;padding:10px 14px}
+details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
+.edit-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.edit-row input{flex:1 1 200px}
+.btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line);padding:9px 16px;font-size:14px}
+
+/* Board */
+.cov{display:grid;gap:12px}
+.cov-row{display:grid;gap:5px}
+.cov-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px}
+.cov-top .name{font-weight:600}
+.cov-top .num{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--marigold);transition:width .4s ease}
+.bar.ok i{background:var(--leaf)}
+.pill{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-left:8px}
+.pill.ok{background:var(--leaf-soft);color:var(--leaf)}
+.pill.mid{background:var(--marigold-soft);color:var(--marigold-ink)}
+.pill.need{background:var(--sunk);color:var(--danger)}
+.claimed{list-style:none;margin:0;padding:0;display:grid}
+.claimed li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.claimed li:first-child{border-top:0}
+.claimed .dn{font-weight:600}
+.claimed .by{font-size:13px;color:var(--muted)}
+.claimed .q{font-size:13px;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.claimed .q small{display:block;color:var(--muted)}
+.empty{color:var(--muted);font-size:14px;padding:10px 0;margin:0}
+.guests{display:flex;flex-wrap:wrap;gap:6px}
+.guest{font-size:13px;padding:4px 10px;border-radius:99px;background:var(--sunk)}
+.guest b{font-variant-numeric:tabular-nums}
+.guest.maybe{background:none;border:1px dashed var(--line);color:var(--muted)}
+
+/* Mobile tabs (hidden on desktop) */
+.mtabs{display:none}
+.seg .lg{font-style:normal}
+
+/* ===== Phone & small tablet ===== */
+@media (max-width:880px){
+  .wrap{padding-block:16px 120px}
+  header.top{gap:8px;padding-bottom:16px;margin-bottom:0;border-bottom:0}
+  h1{font-size:clamp(28px,8vw,38px)}
+  .meta{font-size:14px}
+  .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:8px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 6px;text-align:center;min-width:0}
+  .stat b{font-size:22px}
+  .stat span{font-size:9.5px;letter-spacing:.06em;line-height:1.2;display:block}
+
+  .themes{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px;padding-block:2px}
+  .themes::-webkit-scrollbar{display:none}
+  .mtabs{display:flex;position:sticky;top:env(safe-area-inset-top,0px);z-index:15;gap:4px;padding:4px;margin:0 -4px 14px;background:var(--sunk);border-radius:13px;box-shadow:0 0 0 6px var(--bg)}
+  .mtabs button{flex:1;border:0;background:none;font:inherit;font-weight:700;font-size:15px;color:var(--muted);padding:11px 8px;border-radius:10px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px}
+  .mtabs button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+  .mtabs .n{font-size:12px;background:var(--marigold-soft);color:var(--marigold-ink);border-radius:99px;padding:1px 7px;font-variant-numeric:tabular-nums}
+  .grid[data-view=form] .board{display:none}
+  .grid[data-view=board] .formpane{display:none}
+
+  /* 16px fields stop iOS from zooming in on focus */
+  input[type=text],input[type=email],input[type=tel],input[type=number],select,textarea{font-size:16px;padding:11px 12px}
+  .stepper{grid-template-columns:46px minmax(0,1fr) 46px}
+  .stepper button{font-size:20px;min-height:44px}
+  .seg span{padding:10px 8px;font-size:15px}
+  .seg .lg{display:none}
+  .chip{padding:8px 13px;font-size:14px}
+
+  /* Swipeable chip rows */
+  .cats,.board .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+  .cats::-webkit-scrollbar,.board .chips::-webkit-scrollbar{display:none}
+  .cats{margin-inline:-12px;padding-inline:12px}
+  .chip{flex:none;scroll-snap-align:start}
+
+  .dish{padding:12px}
+  .icon-btn{padding:8px 10px}
+
+  /* Pinned save bar */
+  .submit-bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));flex-wrap:nowrap;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+  .summary{font-size:13px;line-height:1.35;min-width:0}
+  .btn{padding:13px 20px;flex:none}
+  .toast{bottom:calc(env(safe-area-inset-bottom,0px) + 86px)}
+  .claimed li{gap:8px}
+}
+@media (max-width:540px){
+  .fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .fields > *:not(.pair){grid-column:1/-1}
+  .panel{padding:16px 14px;border-radius:14px}
+  .cats{margin-inline:-12px}
+}
+@media (max-width:360px){
+  .stat span{font-size:8.5px}
+  .stat b{font-size:19px}
+}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;font-size:14px;transition:opacity .25s,transform .25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="preview" id="previewNote" hidden>Preview with sample guests. Nothing here is saved. Once deployed with Apps Script, entries go to your Google Sheet.</div>
+
+  <header class="top">
+    <div class="art" id="art" aria-hidden="true"></div>
+    <div class="eyebrow">Potluck · RSVP &amp; food sign-up</div>
+    <h1 id="evName">Montebello Tamil Makkal - Deepavali Potluck</h1>
+    <p class="meta" id="evMeta"></p>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><b id="stFamilies">0</b><span>Families coming</span></div>
+      <div class="stat"><b id="stAdults">0</b><span>Adults</span></div>
+      <div class="stat"><b id="stKids">0</b><span>Kids</span></div>
+      <div class="stat"><b id="stMaybe">0</b><span>Maybe</span></div>
+      <div class="stat"><b id="stDishes">0</b><span>Dishes pledged</span></div>
+    </div>
+    <div class="themes" id="themes" role="group" aria-label="Color theme"></div>
+  </header>
+
+  <nav class="mtabs" id="mtabs" aria-label="Sections">
+    <button type="button" data-view="form" aria-pressed="true">Sign up</button>
+    <button type="button" data-view="board" aria-pressed="false">Food board <span class="n" id="tabCount">0</span></button>
+  </nav>
+
+  <main class="grid" id="grid" data-view="form">
+    <section class="panel stack formpane" aria-labelledby="formTitle">
+      <div class="sec-head">
+        <h2 id="formTitle">Your RSVP</h2>
+        <span class="hint" id="modeHint">New sign-up</span>
+      </div>
+
+      <details class="edit" id="editBox">
+        <summary>Already signed up? Load your RSVP to edit it</summary>
+        <div class="edit-row">
+          <input type="email" id="lookupEmail" placeholder="The email you used" autocomplete="email">
+          <button type="button" class="btn ghost" id="lookupBtn">Load my RSVP</button>
+        </div>
+        <p class="hint" id="lookupMsg" style="margin-top:8px"></p>
+      </details>
+
+      <form id="rsvpForm" class="stack" novalidate>
+        <fieldset class="fields">
+          <label class="f full"><span class="lbl">Family or guest name</span>
+            <input type="text" id="name" autocomplete="name" placeholder="e.g. Ramesh &amp; Priya Iyer" required></label>
+          <label class="f"><span class="lbl">Email <span class="opt">used to edit later</span></span>
+            <input type="email" id="email" autocomplete="email" placeholder="you@example.com" required></label>
+          <label class="f"><span class="lbl">Phone <span class="opt">optional</span></span>
+            <input type="tel" id="phone" autocomplete="tel" placeholder="(510) 555-0142"></label>
+
+          <div class="f full"><span class="lbl">Are you coming?</span>
+            <div class="seg att" role="radiogroup" aria-label="Attending">
+              <label><input type="radio" name="attending" id="attYes" value="Yes" checked><span>Yes<em class="lg">, we'll be there</em></span></label>
+              <label><input type="radio" name="attending" id="attMaybe" value="Maybe"><span>Maybe</span></label>
+              <label><input type="radio" name="attending" id="attNo" value="No"><span>No<em class="lg">, can't make it</em></span></label>
+            </div>
+          </div>
+
+          <div class="f party pair"><span class="lbl">Adults</span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="One fewer adult">−</button><input type="number" id="adults" min="0" max="50" value="2" inputmode="numeric" aria-label="Adults"><button type="button" data-step="1" aria-label="One more adult">+</button></div></div>
+          <div class="f party pair"><span class="lbl">Kids <span class="opt">under 12</span></span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="One fewer kid">−</button><input type="number" id="kids" min="0" max="50" value="0" inputmode="numeric" aria-label="Kids"><button type="button" data-step="1" aria-label="One more kid">+</button></div></div>
+
+          <label class="f party"><span class="lbl">Food preference</span>
+            <select id="diet">
+              <option>Vegetarian</option><option>Non-vegetarian</option>
+            </select></label>
+          <label class="f party"><span class="lbl">Notes <span class="opt">optional</span></span>
+            <input type="text" id="notes" placeholder="Allergies, arriving late…"></label>
+        </fieldset>
+
+        <hr class="div">
+
+        <fieldset class="stack" id="dishSection">
+          <div class="sec-head">
+            <h2>What you're bringing</h2>
+            <span class="hint">Check the board to avoid doubles</span>
+          </div>
+          <div class="dishes" id="dishList"></div>
+          <button type="button" class="add" id="addDish">+ Add another dish</button>
+        </fieldset>
+        <div class="skip" id="skipNote" hidden>No dishes needed. Thanks for letting the host know.</div>
+
+        <div class="submit-bar">
+          <div class="summary" id="partySummary"></div>
+          <button type="submit" class="btn" id="submitBtn">Save RSVP</button>
+        </div>
+        <p class="err" id="formErr" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <aside class="panel board stack" aria-labelledby="boardTitle">
+      <div class="sec-head">
+        <h2 id="boardTitle">Food board</h2>
+        <span class="hint" id="headcountNote"></span>
+      </div>
+
+      <div class="stack" style="gap:10px">
+        <h3>Coverage by course</h3>
+        <div class="cov" id="coverage"></div>
+      </div>
+
+      <hr class="div">
+
+      <div class="stack" style="gap:10px">
+        <h3>Dishes pledged</h3>
+        <div class="chips" id="boardFilter"></div>
+        <ul class="claimed" id="claimed"></ul>
+      </div>
+
+      <hr class="div">
+
+      <div class="stack" style="gap:10px">
+        <h3>Who's coming</h3>
+        <div class="guests" id="guests"></div>
+      </div>
+    </aside>
+  </main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== Edit these for your event ===== */
+const CONFIG = {
+  eventName: 'Montebello Tamil Makkal - Deepavali Potluck',
+  when: 'Saturday, Oct 31 · 12 PM onward',
+  where: 'Montebello Clubhouse',
+  // GitHub Pages: paste your Apps Script Web app URL (ends in /exec). Leave '' inside Apps Script.
+  apiUrl: '',
+  palette: 'diya',          // diya | rangoli | peacock | kumkum | leaf
+  showThemePicker: true,    // set false to hide the theme buttons from guests
+};
+const PALETTES = [
+  { key:'diya',    name:'Diya Gold',   a:'#e8b443', b:'#ff8a3d' },
+  { key:'rangoli', name:'Rangoli',     a:'#ff4f9a', b:'#f6c344' },
+  { key:'peacock', name:'Peacock',     a:'#2ec4b6', b:'#7f9cff' },
+  { key:'kumkum',  name:'Kumkum Red',  a:'#ff5a4e', b:'#f2b84b' },
+  { key:'leaf',    name:'Banana Leaf', a:'#79c497', b:'#f0b23a' },
+];
+function applyPalette(key){
+  if(key === 'diya') document.documentElement.removeAttribute('data-palette');
+  else document.documentElement.setAttribute('data-palette', key);
+  document.querySelectorAll('#themes .sw').forEach(b => b.setAttribute('aria-pressed', b.dataset.pal === key));
+  try{ localStorage.setItem('potluck-palette', key); }catch(e){}
+}
+/* ===== Deepavali art (kolam, agal vilakku, mathappu) ===== */
+function drawArt(){
+  const cx = 316, cy = 118, P = (r, a) => [(cx + r*Math.cos(a)).toFixed(1), (cy + r*Math.sin(a)).toFixed(1)];
+  const petal = (r1, r2, a, w, cls) => {
+    const p1 = P(r1, a), p2 = P(r2, a), c1 = P((r1+r2)/2, a-w), c2 = P((r1+r2)/2, a+w);
+    return `<path class="${cls}" d="M${p1} Q${c1} ${p2} Q${c2} ${p1}Z"/><path class="k" d="M${p1} Q${c1} ${p2} Q${c2} ${p1}Z"/>`;
+  };
+  let k = '';
+  // Outer scalloped border with pulli dots
+  const n = 24, st = 2*Math.PI/n;
+  let sc = '';
+  for(let i = 0; i < n; i++){
+    const a = i*st, p = P(104, a), q = P(104, a+st), c = P(122, a+st/2);
+    sc += (i ? '' : `M${p}`) + ` Q${c} ${q}`;
+    const d = P(114, a); k += `<circle class="dot" cx="${d[0]}" cy="${d[1]}" r="2.1"/>`;
+  }
+  k += `<path class="k" d="${sc}Z"/>`;
+  k += `<circle class="k" cx="${cx}" cy="${cy}" r="98" stroke-dasharray="2 6"/>`;
+  // Lotus rings
+  for(let i = 0; i < 16; i++) k += petal(56, 94, i*Math.PI/8, .14, 'pA');
+  for(let i = 0; i < 16; i++) k += petal(62, 84, i*Math.PI/8 + Math.PI/16, .07, 'pB');
+  for(let i = 0; i < 8; i++)  k += petal(18, 52, i*Math.PI/4, .34, 'pB');
+  for(let i = 0; i < 8; i++){ const d = P(44, i*Math.PI/4 + Math.PI/8); k += `<circle class="dot" cx="${d[0]}" cy="${d[1]}" r="2.4"/>`; }
+  k += `<circle class="pC" cx="${cx}" cy="${cy}" r="13"/><circle class="k" cx="${cx}" cy="${cy}" r="13"/><circle class="dot" cx="${cx}" cy="${cy}" r="3"/>`;
+
+  // Agal vilakku (clay lamps)
+  const lamp = (x, y, s, i) => {
+    const t = v => (v*s).toFixed(1);
+    const fx = x + 33*s, fy = y - 19*s;
+    return `<g>
+      <circle class="glowc" cx="${fx}" cy="${fy - 12*s}" r="${t(34)}" fill="url(#glow)"/>
+      <path d="M${x-30*s} ${y-12*s} Q${x} ${y+24*s} ${x+30*s} ${y-12*s}Z" fill="#b4532c"/>
+      <path d="M${x+20*s} ${y-13*s} L${x+38*s} ${y-21*s} L${x+28*s} ${y-6*s}Z" fill="#9c4423"/>
+      <ellipse cx="${x}" cy="${y-12*s}" rx="${t(30)}" ry="${t(5.5)}" fill="#7a3216"/>
+      <ellipse cx="${x}" cy="${y-12.5*s}" rx="${t(24)}" ry="${t(3.2)}" fill="#e3a43a" fill-opacity=".55"/>
+      <path d="M${x-22*s} ${y-2*s} Q${x} ${y+9*s} ${x+22*s} ${y-2*s}" stroke="#f3d9a4" stroke-opacity=".7" stroke-width="${t(1.4)}" fill="none" stroke-dasharray="${t(1)} ${t(4)}" stroke-linecap="round"/>
+      <path class="flame" style="animation-delay:-${i*0.5}s" d="M${fx} ${fy} C${fx-8*s} ${fy-8*s} ${fx-4*s} ${fy-19*s} ${fx} ${fy-28*s} C${fx+4*s} ${fy-19*s} ${fx+8*s} ${fy-8*s} ${fx} ${fy}Z" fill="url(#flame)"/>
+      <path class="flame" style="animation-delay:-${i*0.5}s" d="M${fx} ${fy-1*s} C${fx-3*s} ${fy-5*s} ${fx-2*s} ${fy-11*s} ${fx} ${fy-15*s} C${fx+2*s} ${fy-11*s} ${fx+3*s} ${fy-5*s} ${fx} ${fy-1*s}Z" fill="#fff6d8"/>
+    </g>`;
+  };
+  const lamps = lamp(150, 286, 1, 0) + lamp(236, 300, 1.15, 1) + lamp(330, 288, 1, 2);
+  // Kolam dot row under the lamps
+  let row = '';
+  for(let x = 120; x <= 380; x += 13) row += `<circle class="dot" cx="${x}" cy="318" r="1.6"/>`;
+
+  // Mathappu sparkles
+  const spark = (x, y, r, d) => {
+    let l = '';
+    for(let i = 0; i < 8; i++){ const a = i*Math.PI/4, r0 = r*.35, rr = i % 2 ? r*.7 : r;
+      l += `<line x1="${(x+r0*Math.cos(a)).toFixed(1)}" y1="${(y+r0*Math.sin(a)).toFixed(1)}" x2="${(x+rr*Math.cos(a)).toFixed(1)}" y2="${(y+rr*Math.sin(a)).toFixed(1)}"/>`; }
+    return `<g class="spark" style="animation-delay:-${d}s">${l}<circle cx="${x}" cy="${y}" r="${(r*.16).toFixed(1)}"/></g>`;
+  };
+  const sparks = spark(70, 66, 15, 0) + spark(150, 26, 10, 1) + spark(36, 168, 8, 2) + spark(176, 132, 6, .6) + spark(96, 230, 7, 1.7);
+
+  $('art').innerHTML = `<svg viewBox="0 0 440 330" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="glow"><stop offset="0" stop-color="#ffc24a" stop-opacity=".55"/><stop offset=".45" stop-color="#ff8a2a" stop-opacity=".18"/><stop offset="1" stop-color="#ff8a2a" stop-opacity="0"/></radialGradient>
+      <linearGradient id="flame" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ff7a1a"/><stop offset=".55" stop-color="#ffb52e"/><stop offset="1" stop-color="#ffe9a0"/></linearGradient>
+    </defs>
+    ${k}${sparks}${row}${lamps}
+  </svg>`;
+}
+
+function initThemes(){
+  let key = CONFIG.palette;
+  if(CONFIG.showThemePicker){
+    try{ const s = localStorage.getItem('potluck-palette'); if(PALETTES.some(p => p.key === s)) key = s; }catch(e){}
+    document.getElementById('themes').innerHTML = '<span class="tl">Color theme</span>' + PALETTES.map(p =>
+      `<button type="button" class="sw" data-pal="${p.key}" aria-pressed="false"><span class="dots"><i style="background:${p.a}"></i><i style="background:${p.b}"></i></span>${p.name}</button>`).join('');
+    document.getElementById('themes').addEventListener('click', e => { const b = e.target.closest('.sw'); if(b) applyPalette(b.dataset.pal); });
+  } else document.getElementById('themes').hidden = true;
+  applyPalette(key);
+}
+
+/* Courses: factor = servings needed per expected person (kids count as half) */
+const CATS = [
+  { key:'Starters', unit:'Pieces', factor:1.5, dishes:[['Samosa'],['Onion Pakora'],['Paneer Tikka'],['Pani Puri'],['Dhokla'],['Medu Vada'],['Aloo Tikki'],['Cut Mirchi'],['Chicken 65',1],['Chicken Tikka',1],['Fish Fry',1]] },
+  { key:'Mains · Veg', unit:'Half tray', factor:1, dishes:[['Paneer Butter Masala'],['Chana Masala'],['Dal Makhani'],['Dal Tadka'],['Palak Paneer'],['Aloo Gobi'],['Vegetable Korma'],['Sambar'],['Rasam'],['Malai Kofta'],['Bhindi Masala'],['Avial']] },
+  { key:'Mains · Non-veg', unit:'Half tray', factor:0.6, nv:true, dishes:[['Butter Chicken',1],['Chicken Chettinad',1],['Chicken Tikka Masala',1],['Lamb Rogan Josh',1],['Goat Curry',1],['Fish Curry',1],['Prawn Masala',1],['Egg Curry',1]] },
+  { key:'Rice & Breads', unit:'Half tray', factor:1, dishes:[['Veg Biryani'],['Chicken Biryani',1],['Goat Biryani',1],['Jeera Rice'],['Lemon Rice'],['Curd Rice'],['Pulao'],['Naan'],['Roti / Chapati'],['Puri'],['Parotta']] },
+  { key:'Sides & Chutneys', unit:'Servings', factor:0.5, dishes:[['Raita'],['Kachumber Salad'],['Papad'],['Mango Pickle'],['Mint Chutney'],['Coconut Chutney'],['Tamarind Chutney']] },
+  { key:'Desserts', unit:'Pieces', factor:1, nospice:true, dishes:[['Gulab Jamun'],['Rasmalai'],['Rasgulla'],['Kheer / Payasam'],['Gajar Halwa'],['Mysore Pak'],['Kaju Katli'],['Kulfi'],['Jalebi'],['Shrikhand']] },
+  { key:'Drinks', unit:'Litres', factor:1, nospice:true, dishes:[['Mango Lassi'],['Masala Chai'],['Filter Coffee'],['Nimbu Pani'],['Rose Milk'],['Buttermilk (Chaas)'],['Soft drinks'],['Water']] },
+];
+/* Servings per unit */
+const UNITS = { 'Servings':1, 'Pieces':0.5, 'Dozen':6, 'Half tray':15, 'Full tray':30, 'Litres':4 };
+const UNIT_HINT = { 'Pieces':'2 per person', 'Dozen':'≈6 servings', 'Half tray':'≈15 servings', 'Full tray':'≈30 servings', 'Litres':'≈4 cups' };
+const MAX_DISHES = 10;
+
+/* ===== Data layer: Apps Script when deployed, in-memory sample data in preview ===== */
+const HAS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
+const demo = (() => {
+  const db = {
+    rsvps:[
+      {id:'a1',name:'Ananya & Vikram R.',email:'ananya@example.com',phone:'',attending:'Yes',adults:2,kids:2,diet:'Vegetarian',notes:''},
+      {id:'b2',name:'Karthik & Divya',email:'karthik@example.com',phone:'',attending:'Yes',adults:2,kids:1,diet:'Non-vegetarian',notes:''},
+      {id:'c3',name:'Meera S.',email:'meera@example.com',phone:'',attending:'Maybe',adults:1,kids:0,diet:'Vegan',notes:''},
+      {id:'d4',name:'The Nair family',email:'nair@example.com',phone:'',attending:'Yes',adults:4,kids:2,diet:'Non-vegetarian',notes:''},
+    ],
+    dishes:[
+      {id:'a1',category:'Rice & Breads',dish:'Veg Biryani',veg:'Veg',spice:'Medium',qty:1,unit:'Full tray',servings:30,notes:''},
+      {id:'a1',category:'Desserts',dish:'Gulab Jamun',veg:'Veg',spice:'',qty:40,unit:'Pieces',servings:20,notes:''},
+      {id:'b2',category:'Starters',dish:'Chicken 65',veg:'Non-veg',spice:'Hot',qty:1,unit:'Half tray',servings:15,notes:''},
+      {id:'b2',category:'Mains · Veg',dish:'Chana Masala',veg:'Veg',spice:'Medium',qty:1,unit:'Half tray',servings:15,notes:''},
+      {id:'c3',category:'Drinks',dish:'Mango Lassi',veg:'Veg',spice:'',qty:4,unit:'Litres',servings:16,notes:''},
+      {id:'d4',category:'Mains · Non-veg',dish:'Chicken Chettinad',veg:'Non-veg',spice:'Hot',qty:1,unit:'Half tray',servings:15,notes:''},
+      {id:'d4',category:'Sides & Chutneys',dish:'Raita',veg:'Veg',spice:'Mild',qty:20,unit:'Servings',servings:20,notes:''},
+    ]
+  };
+  const pub = () => ({
+    rsvps: db.rsvps.map(r => ({id:r.id,name:r.name,attending:r.attending,adults:r.adults,kids:r.kids})),
+    dishes: db.dishes.map(d => ({...d, name:(db.rsvps.find(r=>r.id===d.id)||{}).name}))
+  });
+  return {
+    getData: pub,
+    findMyRsvp(email){
+      const r = db.rsvps.find(x => x.email === String(email).trim().toLowerCase());
+      return r ? {...r, dishes: db.dishes.filter(d => d.id === r.id)} : null;
+    },
+    submitRsvp(p){
+      if(!p.name.trim()) throw new Error('Please enter your name.');
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(p.email)) throw new Error('Please enter a valid email. It is how you edit your RSVP later.');
+      const email = p.email.trim().toLowerCase();
+      let r = db.rsvps.find(x => x.email === email);
+      if(!r){ r = {id: Math.random().toString(36).slice(2,10)}; db.rsvps.push(r); }
+      Object.assign(r, {name:p.name, email, phone:p.phone, attending:p.attending, adults:+p.adults||0, kids:+p.kids||0, diet:p.diet, notes:p.notes});
+      db.dishes = db.dishes.filter(d => d.id !== r.id);
+      if(p.attending !== 'No') p.dishes.forEach(d => db.dishes.push({...d, id:r.id}));
+      return {id:r.id, data:pub()};
+    }
+  };
+})();
+const LIVE = !!(HAS_GAS || CONFIG.apiUrl);
+async function remote(fn, arg){
+  let res;
+  try{
+    if(fn === 'getData'){
+      res = await fetch(CONFIG.apiUrl + (CONFIG.apiUrl.includes('?') ? '&' : '?') + 'action=getData&t=' + Date.now());
+    } else {
+      const body = fn === 'submitRsvp' ? {action:fn, payload:arg} : {action:fn, email:arg};
+      res = await fetch(CONFIG.apiUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(body)});
+    }
+  }catch(e){ throw new Error('Could not reach the sign-up sheet. Check your connection and try again.'); }
+  let j;
+  try{ j = await res.json(); }catch(e){ throw new Error('The sign-up sheet sent an unexpected reply. Make sure the web app is deployed with access set to "Anyone".'); }
+  if(!j.ok) throw new Error(j.error || 'Request failed.');
+  return j.data;
+}
+function api(fn, ...args){
+  if(HAS_GAS) return new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));
+  if(CONFIG.apiUrl) return remote(fn, args[0]);
+  return new Promise((res, rej) => setTimeout(() => { try{ res(demo[fn](...args)); }catch(e){ rej(e); } }, 250));
+}
+
+/* ===== State ===== */
+let board = {rsvps:[], dishes:[]};
+let myId = null;
+let filter = 'All';
+let rowSeq = 0;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const catOf = key => CATS.find(c => c.key === key) || CATS[0];
+const fmt = n => (Math.round(n*10)/10).toLocaleString();
+
+/* ===== Dish rows ===== */
+function buildDatalists(){
+  CATS.forEach((c, i) => {
+    const dl = document.createElement('datalist');
+    dl.id = 'dl-' + i;
+    dl.innerHTML = c.dishes.map(d => `<option value="${esc(d[0])}"></option>`).join('');
+    document.body.appendChild(dl);
+  });
+}
+
+function addDishRow(d = {}){
+  const list = $('dishList');
+  if(list.children.length >= MAX_DISHES) return;
+  const n = ++rowSeq;
+  const cat = catOf(d.category || 'Mains · Veg');
+  const el = document.createElement('div');
+  el.className = 'dish';
+  el.dataset.row = n;
+  el.innerHTML = `
+    <div class="dish-head"><span class="dish-num"></span>
+      <button type="button" class="icon-btn rm" aria-label="Remove this dish">Remove</button></div>
+    <div class="chips cats" role="group" aria-label="Course">
+      ${CATS.map(c => `<button type="button" class="chip" data-cat="${esc(c.key)}" aria-pressed="${c.key===cat.key}">${esc(c.key)}</button>`).join('')}
+    </div>
+    <label class="f"><span class="lbl">Dish <span class="opt">pick from the list or type your own</span></span>
+      <input type="text" id="dish-${n}-name" class="dname" list="dl-${CATS.indexOf(cat)}" placeholder="Start typing… e.g. ${esc(cat.dishes[0][0])}" value="${esc(d.dish||'')}" autocomplete="off"></label>
+    <p class="dup" hidden></p>
+    <div class="qty-row">
+      <div class="f"><span class="lbl">Quantity</span>
+        <div class="stepper"><button type="button" data-step="-1" aria-label="Less">−</button><input type="number" id="dish-${n}-qty" class="qty" min="0" max="500" value="${d.qty != null ? d.qty : 1}" inputmode="decimal" aria-label="Quantity"><button type="button" data-step="1" aria-label="More">+</button></div></div>
+      <label class="f"><span class="lbl">Unit</span>
+        <select id="dish-${n}-unit" class="unit">${Object.keys(UNITS).map(u => `<option value="${u}">${u}${UNIT_HINT[u] ? ' ('+UNIT_HINT[u]+')' : ''}</option>`).join('')}</select></label>
+      <div class="serves">Serves about <b class="sv">0</b></div>
+    </div>
+    <div class="two">
+      <div class="f"><span class="lbl">Type</span>
+        <div class="seg" role="radiogroup" aria-label="Veg or non-veg">
+          <label><input type="radio" name="veg-${n}" value="Veg"><span><i class="vm"></i>Veg</span></label>
+          <label><input type="radio" name="veg-${n}" value="Non-veg"><span><i class="vm nv"></i>Non-veg</span></label>
+        </div></div>
+      <div class="f spice"><span class="lbl">Spice level</span>
+        <div class="seg" role="radiogroup" aria-label="Spice level">
+          <label><input type="radio" name="spice-${n}" value="Mild"><span>Mild</span></label>
+          <label><input type="radio" name="spice-${n}" value="Medium"><span>Medium</span></label>
+          <label><input type="radio" name="spice-${n}" value="Hot"><span>Hot</span></label>
+        </div></div>
+    </div>
+    <label class="f"><span class="lbl">Dish notes <span class="opt">optional</span></span>
+      <input type="text" id="dish-${n}-notes" class="dnotes" placeholder="Contains nuts, egg-free, Jain…" value="${esc(d.notes||'')}"></label>`;
+  list.appendChild(el);
+  el.querySelector('.unit').value = d.unit || cat.unit;
+  setRadio(el, 'veg-'+n, d.veg || (cat.nv ? 'Non-veg' : 'Veg'));
+  setRadio(el, 'spice-'+n, d.spice || 'Medium');
+  setCat(el, cat.key, false);
+  updateRow(el);
+  renumber();
+  return el;
+}
+function setRadio(scope, name, val){
+  const r = scope.querySelector(`input[name="${name}"][value="${val}"]`);
+  if(r) r.checked = true;
+}
+function setCat(el, key, applyDefaults){
+  const c = catOf(key);
+  el.dataset.cat = c.key;
+  el.querySelectorAll('.cats .chip').forEach(b => b.setAttribute('aria-pressed', b.dataset.cat === c.key));
+  const inp = el.querySelector('.dname');
+  inp.setAttribute('list', 'dl-' + CATS.indexOf(c));
+  inp.placeholder = 'Start typing… e.g. ' + c.dishes[0][0];
+  if(c.nospice) el.dataset.nospice = ''; else delete el.dataset.nospice;
+  if(applyDefaults){
+    el.querySelector('.unit').value = c.unit;
+    setRadio(el, 'veg-'+el.dataset.row, c.nv ? 'Non-veg' : 'Veg');
+  }
+}
+function readRow(el){
+  const n = el.dataset.row;
+  const unit = el.querySelector('.unit').value;
+  const qty = Math.max(0, parseFloat(el.querySelector('.qty').value) || 0);
+  const c = catOf(el.dataset.cat);
+  return {
+    category: c.key,
+    dish: el.querySelector('.dname').value.trim(),
+    veg: (el.querySelector(`input[name="veg-${n}"]:checked`)||{}).value || 'Veg',
+    spice: c.nospice ? '' : ((el.querySelector(`input[name="spice-${n}"]:checked`)||{}).value || ''),
+    qty, unit,
+    servings: Math.round(qty * (UNITS[unit] || 1)),
+    notes: el.querySelector('.dnotes').value.trim()
+  };
+}
+function updateRow(el){
+  const d = readRow(el);
+  el.querySelector('.sv').textContent = d.servings;
+  const dup = el.querySelector('.dup');
+  const key = d.dish.toLowerCase();
+  const hit = key && board.dishes.find(x => x.id !== myId && String(x.dish).toLowerCase() === key);
+  if(hit){
+    dup.hidden = false;
+    dup.textContent = `${hit.name || 'Someone'} is already bringing ${hit.dish} (${fmt(hit.qty)} ${hit.unit.toLowerCase()}). You can still add it, or pick something the board is short on.`;
+  } else dup.hidden = true;
+  updateSummary();
+}
+function renumber(){
+  const rows = [...$('dishList').children];
+  rows.forEach((el, i) => {
+    el.querySelector('.dish-num').textContent = 'Dish ' + (i+1);
+    el.querySelector('.rm').hidden = rows.length === 1;
+  });
+  $('addDish').disabled = rows.length >= MAX_DISHES;
+}
+
+/* ===== Form ===== */
+function attending(){ return (document.querySelector('input[name=attending]:checked')||{}).value || 'Yes'; }
+function syncAttending(){
+  const no = attending() === 'No';
+  $('dishSection').hidden = no;
+  $('skipNote').hidden = !no;
+  document.querySelectorAll('.party').forEach(e => e.style.opacity = no ? .45 : 1);
+  updateSummary();
+}
+function updateSummary(){
+  if(attending() === 'No'){ $('partySummary').textContent = 'Sending regrets'; return; }
+  const a = +$('adults').value || 0, k = +$('kids').value || 0;
+  const ds = [...$('dishList').children].map(readRow).filter(d => d.dish);
+  const sv = ds.reduce((s, d) => s + d.servings, 0);
+  $('partySummary').innerHTML = `<b>${a}</b> adult${a===1?'':'s'} · <b>${k}</b> kid${k===1?'':'s'} · <b>${ds.length}</b> dish${ds.length===1?'':'es'}${sv ? ` (~<b>${sv}</b> servings)` : ''}`;
+}
+function fillForm(r){
+  myId = r.id;
+  $('name').value = r.name || '';
+  $('email').value = r.email || '';
+  $('phone').value = r.phone || '';
+  setRadio(document, 'attending', r.attending || 'Yes');
+  $('adults').value = r.adults || 0;
+  $('kids').value = r.kids || 0;
+  if(r.diet) $('diet').value = r.diet;
+  $('notes').value = r.notes || '';
+  $('dishList').innerHTML = '';
+  (r.dishes && r.dishes.length ? r.dishes : [{}]).forEach(d => addDishRow(d));
+  $('modeHint').textContent = 'Editing your RSVP';
+  $('submitBtn').textContent = 'Update RSVP';
+  syncAttending();
+}
+function showErr(msg){ const e = $('formErr'); e.textContent = msg; e.hidden = !msg; }
+
+/* ===== Board ===== */
+function render(){
+  const yes = board.rsvps.filter(r => r.attending === 'Yes');
+  const maybe = board.rsvps.filter(r => r.attending === 'Maybe');
+  const sum = (arr, k) => arr.reduce((s, r) => s + (+r[k] || 0), 0);
+  const adults = sum(yes, 'adults'), kids = sum(yes, 'kids');
+  $('stFamilies').textContent = yes.length;
+  $('stAdults').textContent = adults;
+  $('stKids').textContent = kids;
+  $('stMaybe').textContent = maybe.length;
+  $('stDishes').textContent = board.dishes.length;
+  $('tabCount').textContent = board.dishes.length;
+
+  // Expected eaters: confirmed + maybes; kids count as half
+  const eaters = adults + kids*0.5 + sum(maybe,'adults') + sum(maybe,'kids')*0.5;
+  $('headcountNote').textContent = `Planning for ~${Math.ceil(eaters)} people`;
+
+  $('coverage').innerHTML = CATS.map(c => {
+    const pledged = board.dishes.filter(d => d.category === c.key).reduce((s, d) => s + (+d.servings || 0), 0);
+    const target = Math.max(1, Math.ceil(eaters * c.factor));
+    const pct = Math.min(100, Math.round(pledged / target * 100));
+    const st = pct >= 100 ? ['ok','Covered'] : pct >= 50 ? ['mid','Getting there'] : ['need','Needed'];
+    return `<div class="cov-row">
+      <div class="cov-top"><span class="name">${esc(c.key)}<span class="pill ${st[0]}">${st[1]}</span></span>
+        <span class="num">${pledged} / ${target} servings</span></div>
+      <div class="bar ${st[0]==='ok'?'ok':''}" role="img" aria-label="${esc(c.key)}: ${pct}% covered"><i style="width:${pct}%"></i></div>
+    </div>`;
+  }).join('');
+
+  const counts = {};
+  board.dishes.forEach(d => counts[d.category] = (counts[d.category]||0) + 1);
+  $('boardFilter').innerHTML = ['All', ...CATS.map(c => c.key)].map(k => {
+    const n = k === 'All' ? board.dishes.length : (counts[k]||0);
+    return `<button type="button" class="chip" data-filter="${esc(k)}" aria-pressed="${filter===k}">${esc(k)}<span class="n">${n}</span></button>`;
+  }).join('');
+
+  const order = k => CATS.findIndex(c => c.key === k);
+  const shown = board.dishes.filter(d => filter === 'All' || d.category === filter)
+    .sort((a, b) => order(a.category) - order(b.category) || String(a.dish).localeCompare(b.dish));
+  $('claimed').innerHTML = shown.length ? shown.map(d => `
+    <li><i class="vm ${d.veg==='Non-veg'?'nv':''}" title="${esc(d.veg)}"></i>
+      <div><div class="dn">${esc(d.dish)}${d.id===myId?' <span class="pill ok">Yours</span>':''}</div>
+        <div class="by">${esc(d.name||'')}${filter==='All'?' · '+esc(d.category):''}${d.spice?' · '+esc(d.spice):''}${d.notes?' · '+esc(d.notes):''}</div></div>
+      <div class="q">${fmt(d.qty)} ${esc(String(d.unit).toLowerCase())}<small>~${d.servings} servings</small></div></li>`).join('')
+    : `<li style="display:block"><p class="empty">${filter==='All' ? 'No dishes yet. Be the first to sign up.' : 'Nothing pledged for '+esc(filter)+' yet.'}</p></li>`;
+
+  const going = [...yes, ...maybe];
+  $('guests').innerHTML = going.length ? going.map(r =>
+    `<span class="guest ${r.attending==='Maybe'?'maybe':''}">${esc(r.name)} · <b>${(+r.adults||0)+(+r.kids||0)}</b>${r.attending==='Maybe'?' (maybe)':''}</span>`).join('')
+    : '<p class="empty">No RSVPs yet.</p>';
+
+  [...$('dishList').children].forEach(updateRow);
+}
+
+const isPhone = () => window.matchMedia('(max-width:880px)').matches;
+function setView(v){
+  $('grid').dataset.view = v;
+  document.querySelectorAll('#mtabs [data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === v));
+  const top = $('mtabs').getBoundingClientRect().top + window.scrollY - 8;
+  if(window.scrollY > top) window.scrollTo({top, behavior:'smooth'});
+}
+
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ===== Events ===== */
+document.addEventListener('click', e => {
+  const step = e.target.closest('[data-step]');
+  if(step){
+    const inp = step.parentElement.querySelector('input');
+    const v = Math.max(+inp.min || 0, Math.min(+inp.max || 999, (parseFloat(inp.value) || 0) + (+step.dataset.step)));
+    inp.value = v;
+    inp.dispatchEvent(new Event('input', {bubbles:true}));
+    return;
+  }
+  const tab = e.target.closest('#mtabs [data-view]');
+  if(tab){ setView(tab.dataset.view); return; }
+  const catBtn = e.target.closest('.cats .chip');
+  if(catBtn){
+    const row = catBtn.closest('.dish'); setCat(row, catBtn.dataset.cat, true); updateRow(row);
+    catBtn.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'});
+    return;
+  }
+  const rm = e.target.closest('.rm');
+  if(rm){ rm.closest('.dish').remove(); renumber(); updateSummary(); return; }
+  const f = e.target.closest('[data-filter]');
+  if(f){ filter = f.dataset.filter; render(); }
+});
+document.addEventListener('input', e => {
+  const row = e.target.closest('.dish');
+  if(row){
+    if(e.target.classList.contains('dname')){
+      // Auto-set veg/non-veg when a catalog dish is picked
+      const c = catOf(row.dataset.cat);
+      const hit = c.dishes.find(d => d[0].toLowerCase() === e.target.value.trim().toLowerCase());
+      if(hit) setRadio(row, 'veg-'+row.dataset.row, hit[1] ? 'Non-veg' : 'Veg');
+    }
+    updateRow(row);
+  } else updateSummary();
+});
+document.addEventListener('change', e => {
+  if(e.target.name === 'attending') syncAttending();
+  const row = e.target.closest('.dish'); if(row) updateRow(row);
+});
+$('addDish').addEventListener('click', () => { const el = addDishRow(); if(el) el.querySelector('.dname').focus(); });
+
+$('lookupBtn').addEventListener('click', () => {
+  const email = $('lookupEmail').value.trim();
+  if(!email){ $('lookupMsg').textContent = 'Enter the email you signed up with.'; return; }
+  $('lookupMsg').textContent = 'Looking…';
+  api('findMyRsvp', email).then(r => {
+    if(!r){ $('lookupMsg').textContent = 'No RSVP found for that email. Fill in the form below to sign up.'; $('email').value = email; return; }
+    fillForm(r);
+    $('lookupMsg').textContent = 'Loaded. Make your changes and press Update RSVP.';
+    $('editBox').open = false;
+    render();
+  }).catch(err => $('lookupMsg').textContent = err.message || 'Could not load that RSVP.');
+});
+
+$('rsvpForm').addEventListener('submit', e => {
+  e.preventDefault();
+  showErr('');
+  const payload = {
+    id: myId || '',
+    name: $('name').value.trim(), email: $('email').value.trim(), phone: $('phone').value.trim(),
+    attending: attending(), adults: +$('adults').value || 0, kids: +$('kids').value || 0,
+    diet: $('diet').value, notes: $('notes').value.trim(),
+    dishes: attending() === 'No' ? [] : [...$('dishList').children].map(readRow).filter(d => d.dish)
+  };
+  if(!payload.name){ showErr('Please enter your name.'); $('name').focus(); toast('Please enter your name.'); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email)){ showErr('Please enter a valid email. It is how you edit your RSVP later.'); $('email').focus(); toast('Please enter a valid email.'); return; }
+  if(payload.attending !== 'No' && payload.adults + payload.kids === 0){ showErr('Add at least one adult or kid to your party.'); return; }
+  const btn = $('submitBtn'); const was = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  api('submitRsvp', payload).then(res => {
+    myId = res.id; board = res.data; render();
+    $('modeHint').textContent = 'Editing your RSVP';
+    btn.textContent = 'Update RSVP';
+    toast(LIVE ? 'RSVP saved to the sheet. Thank you!' : 'Saved in this preview only');
+    if(isPhone() && payload.attending !== 'No') setView('board');
+  }).catch(err => { showErr(err.message || 'Could not save. Please try again.'); btn.textContent = was; })
+    .finally(() => { btn.disabled = false; });
+});
+
+/* ===== Start ===== */
+$('evName').textContent = CONFIG.eventName;
+$('evMeta').textContent = [CONFIG.when, CONFIG.where].filter(Boolean).join(' · ');
+document.title = CONFIG.eventName + ' RSVP';
+$('previewNote').hidden = LIVE;
+initThemes();
+drawArt();
+buildDatalists();
+addDishRow({category:'Mains · Veg'});
+syncAttending();
+api('getData').then(d => { board = d; render(); }).catch(() => toast('Could not load the board. Refresh to try again.'));
+render();
+if(LIVE) setInterval(() => api('getData').then(d => { board = d; render(); }).catch(()=>{}), 60000);
+</script>
