@@ -280,7 +280,7 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
 </style>
 
 <div class="wrap">
-  
+  <div class="preview" id="previewNote" hidden>Preview with sample guests. Nothing here is saved. Once deployed with Apps Script, entries go to your Google Sheet.</div>
 
   <header class="top">
     <div class="art" id="art" aria-hidden="true"></div>
@@ -405,7 +405,7 @@ const CONFIG = {
   when: 'Saturday, Oct 31 · 12 PM onward',
   where: 'Montebello Clubhouse',
   // GitHub Pages: paste your Apps Script Web app URL (ends in /exec). Leave '' inside Apps Script.
-  apiUrl: 'https://script.google.com/macros/s/AKfycbyrntl1lTIcftM2e9LYtrwkvSId8MWQMxljU0qw7akzpwbfpmQkcBgPoNNlYiz0sZSIDg/exec',
+  apiUrl: '',
   palette: 'diya',          // diya | rangoli | peacock | kumkum | leaf
   showThemePicker: true,    // set false to hide the theme buttons from guests
 };
@@ -518,7 +518,7 @@ const demo = (() => {
     rsvps:[
       {id:'a1',name:'Ananya & Vikram R.',email:'ananya@example.com',phone:'',attending:'Yes',adults:2,kids:2,diet:'Vegetarian',notes:''},
       {id:'b2',name:'Karthik & Divya',email:'karthik@example.com',phone:'',attending:'Yes',adults:2,kids:1,diet:'Non-vegetarian',notes:''},
-      {id:'c3',name:'Meera S.',email:'meera@example.com',phone:'',attending:'Maybe',adults:1,kids:0,diet:'Vegan',notes:''},
+      {id:'c3',name:'Meera S.',email:'meera@example.com',phone:'',attending:'Maybe',adults:1,kids:0,diet:'Vegetarian',notes:''},
       {id:'d4',name:'The Nair family',email:'nair@example.com',phone:'',attending:'Yes',adults:4,kids:2,diet:'Non-vegetarian',notes:''},
     ],
     dishes:[
@@ -555,20 +555,23 @@ const demo = (() => {
   };
 })();
 const LIVE = !!(HAS_GAS || CONFIG.apiUrl);
-async function remote(fn, arg){
-  let res;
-  try{
-    if(fn === 'getData'){
-      res = await fetch(CONFIG.apiUrl + (CONFIG.apiUrl.includes('?') ? '&' : '?') + 'action=getData&t=' + Date.now());
-    } else {
-      const body = fn === 'submitRsvp' ? {action:fn, payload:arg} : {action:fn, email:arg};
-      res = await fetch(CONFIG.apiUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(body)});
-    }
-  }catch(e){ throw new Error('Could not reach the sign-up sheet. Check your connection and try again.'); }
-  let j;
-  try{ j = await res.json(); }catch(e){ throw new Error('The sign-up sheet sent an unexpected reply. Make sure the web app is deployed with access set to "Anyone".'); }
+async function call(url, opts){
+  let res, j;
+  try{ res = await fetch(url, opts); }
+  catch(e){ throw new Error('Could not reach the sign-up sheet. Check your connection and try again.'); }
+  try{ j = await res.json(); }
+  catch(e){ throw new Error('The sign-up sheet sent an unexpected reply. Make sure the web app is deployed with access set to "Anyone".'); }
   if(!j.ok) throw new Error(j.error || 'Request failed.');
   return j.data;
+}
+async function remote(fn, arg){
+  const post = body => call(CONFIG.apiUrl, {method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(body)});
+  if(fn === 'getData'){
+    // POST is the same route that saving uses; fall back to GET for older script versions
+    try{ return await post({action:'getData'}); }
+    catch(e){ return await call(CONFIG.apiUrl + (CONFIG.apiUrl.includes('?') ? '&' : '?') + 'action=getData&t=' + Date.now(), {cache:'no-store'}); }
+  }
+  return post(fn === 'submitRsvp' ? {action:fn, payload:arg} : {action:fn, email:arg});
 }
 function api(fn, ...args){
   if(HAS_GAS) return new Promise((res, rej) => google.script.run.withSuccessHandler(res).withFailureHandler(rej)[fn](...args));
@@ -733,7 +736,27 @@ function fillForm(r){
 function showErr(msg){ const e = $('formErr'); e.textContent = msg; e.hidden = !msg; }
 
 /* ===== Board ===== */
+let loadState = 'loading', loadErr = '';
+function loadBoard(attempt = 1){
+  return api('getData').then(d => { board = d; loadState = 'ok'; render(); })
+    .catch(err => {
+      if(loadState === 'ok') return;              // a background refresh failed; keep what's shown
+      if(attempt < 3) { setTimeout(() => loadBoard(attempt + 1), 1500 * attempt); return; }
+      loadState = 'error'; loadErr = err.message || 'Could not load the board.'; render();
+    });
+}
+function renderPending(){
+  ['stFamilies','stAdults','stKids','stMaybe','stDishes','tabCount'].forEach(id => $(id).textContent = '…');
+  $('headcountNote').textContent = '';
+  $('boardFilter').innerHTML = '';
+  $('guests').innerHTML = '';
+  $('claimed').innerHTML = '';
+  $('coverage').innerHTML = loadState === 'error'
+    ? `<p class="empty">${esc(loadErr)}</p><button type="button" class="btn ghost" data-retry>Try again</button>`
+    : `<p class="empty">Loading the latest RSVPs and dishes…</p>${CATS.map(() => '<div class="bar"><i style="width:0"></i></div>').join('')}`;
+}
 function render(){
+  if(loadState !== 'ok'){ renderPending(); return; }
   const yes = board.rsvps.filter(r => r.attending === 'Yes');
   const maybe = board.rsvps.filter(r => r.attending === 'Maybe');
   const sum = (arr, k) => arr.reduce((s, r) => s + (+r[k] || 0), 0);
@@ -809,6 +832,7 @@ document.addEventListener('click', e => {
     inp.dispatchEvent(new Event('input', {bubbles:true}));
     return;
   }
+  if(e.target.closest('[data-retry]')){ loadState = 'loading'; render(); loadBoard(); return; }
   const tab = e.target.closest('#mtabs [data-view]');
   if(tab){ setView(tab.dataset.view); return; }
   const catBtn = e.target.closest('.cats .chip');
@@ -869,7 +893,7 @@ $('rsvpForm').addEventListener('submit', e => {
   const btn = $('submitBtn'); const was = btn.textContent;
   btn.disabled = true; btn.textContent = 'Saving…';
   api('submitRsvp', payload).then(res => {
-    myId = res.id; board = res.data; render();
+    myId = res.id; board = res.data; loadState = 'ok'; render();
     $('modeHint').textContent = 'Editing your RSVP';
     btn.textContent = 'Update RSVP';
     toast(LIVE ? 'RSVP saved to the sheet. Thank you!' : 'Saved in this preview only');
@@ -888,7 +912,7 @@ drawArt();
 buildDatalists();
 addDishRow({category:'Mains · Veg'});
 syncAttending();
-api('getData').then(d => { board = d; render(); }).catch(() => toast('Could not load the board. Refresh to try again.'));
 render();
-if(LIVE) setInterval(() => api('getData').then(d => { board = d; render(); }).catch(()=>{}), 60000);
+loadBoard();
+if(LIVE) setInterval(() => loadBoard(3), 60000);
 </script>
