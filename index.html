@@ -47,6 +47,8 @@
   --glow:rgba(121,196,151,.13);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
+img{max-width:100%}
 html,body{background:var(--bg)}
 body{background-image:radial-gradient(1100px 420px at 15% -120px, var(--glow), transparent 70%);background-repeat:no-repeat}
 
@@ -280,7 +282,7 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
 </style>
 
 <div class="wrap">
-  <!-- <div class="preview" id="previewNote" hidden>Preview with sample guests. Nothing here is saved. Once deployed with Apps Script, entries go to your Google Sheet.</div> -->
+  <div class="preview" id="previewNote" hidden>Preview with sample guests. Nothing here is saved. Once deployed with Apps Script, entries go to your Google Sheet.</div>
 
   <header class="top">
     <div class="art" id="art" aria-hidden="true"></div>
