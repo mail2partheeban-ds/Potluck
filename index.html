@@ -1,6 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Montebello Tamil Makkal - Deepavali Potluck RSVP</title>
+<meta name="description" content="RSVP and sign up for a dish for the Montebello Tamil Makkal Deepavali Potluck.">
+<meta name="theme-color" content="#0a0907">
+<title>Deepavali Potluck RSVP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
@@ -90,6 +95,11 @@ header.top > *:not(.art){position:relative;z-index:1}
 @keyframes breathe{from{opacity:.75}to{opacity:1}}
 @keyframes twinkle{0%,100%{opacity:1}50%{opacity:.35}}
 @media (prefers-reduced-motion:reduce){.art *{animation:none!important}}
+/* Crackers: canvas fireworks over the top-right art */
+#fx{position:absolute;top:-30px;right:0;width:min(520px,56%);height:320px;pointer-events:none;z-index:0}
+@media (max-width:880px){ #fx{width:300px;height:230px;top:-16px;opacity:.85} }
+@media (max-width:420px){ #fx{width:240px;height:200px} }
+@media (prefers-reduced-motion:reduce){ #fx{display:none} }
 @media (max-width:880px){
   .art{width:230px;top:-10px;opacity:.5}
   header.top h1{text-shadow:0 2px 12px var(--bg)}
@@ -206,6 +216,34 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
 .pill.ok{background:var(--leaf-soft);color:var(--leaf)}
 .pill.mid{background:var(--marigold-soft);color:var(--marigold-ink)}
 .pill.need{background:var(--sunk);color:var(--danger)}
+.h3n{text-transform:none;letter-spacing:0;font-weight:500}
+.stat span .vm{width:11px;height:11px;vertical-align:-1px;margin-right:2px}
+.stat span .vm::after{width:5px;height:5px}
+.splits{display:grid;gap:14px}
+.split{display:grid;gap:6px}
+.split-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;font-size:14px}
+.split-top .lab{font-weight:600}
+.split-top .vals{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.split-top .vals b{color:var(--ink)}
+.split-top .vals span{display:inline-flex;align-items:center;gap:5px}
+.sbar{display:flex;gap:2px;height:10px;border-radius:99px;overflow:hidden;background:var(--sunk)}
+.sbar i{display:block;height:100%;transition:width .4s ease}
+.sbar .v{background:var(--veg)}
+.sbar .n{background:var(--nonveg)}
+.cov-top .name{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;min-width:0}
+.cov-top .name .pill,.cov-top .name .slots{margin-left:0}
+.pill{white-space:nowrap}
+.slots{display:inline-flex;gap:3px;margin-left:8px}
+.slots i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--muted)}
+.slots i.on{background:var(--marigold);border-color:var(--marigold)}
+.slots .extra{font-size:11px;color:var(--marigold-ink);margin-left:2px;line-height:8px}
+.chip.want .cf{color:var(--marigold-ink);opacity:1}
+.chip[aria-pressed=true].want .cf{color:inherit}
+.catneed{margin:0}
+.pill.full{background:var(--sunk);color:var(--muted)}
+.chip:disabled{opacity:.4;cursor:not-allowed}
+.chip:disabled:hover{border-color:var(--line)}
+.serves .cap{opacity:.75}
 .claimed{list-style:none;margin:0;padding:0;display:grid}
 .claimed li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .claimed li:first-child{border-top:0}
@@ -217,6 +255,12 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
 .guests{display:flex;flex-wrap:wrap;gap:6px}
 .guest{font-size:13px;padding:4px 10px;border-radius:99px;background:var(--sunk)}
 .guest b{font-variant-numeric:tabular-nums}
+.guest .gd{display:inline-flex;align-items:center;gap:4px;margin-left:8px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.guest .gd .vm{width:11px;height:11px}
+.guest .gd .vm::after{width:5px;height:5px}
+.guest .gd .vm + .vm, .guest .gd .vm:not(:first-child){margin-left:4px}
+.lbl .vm{width:12px;height:12px;vertical-align:-1px;margin-right:3px}
+.lbl .vm::after{width:5px;height:5px}
 .guest.maybe{background:none;border:1px dashed var(--line);color:var(--muted)}
 
 /* Mobile tabs (hidden on desktop) */
@@ -229,10 +273,10 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
   header.top{gap:8px;padding-bottom:16px;margin-bottom:0;border-bottom:0}
   h1{font-size:clamp(28px,8vw,38px)}
   .meta{font-size:14px}
-  .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:8px}
+  .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
   .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 6px;text-align:center;min-width:0}
   .stat b{font-size:22px}
-  .stat span{font-size:9.5px;letter-spacing:.06em;line-height:1.2;display:block}
+  .stat span{font-size:10.5px;letter-spacing:.05em;line-height:1.25;display:block}
 
   .themes{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px;padding-block:2px}
   .themes::-webkit-scrollbar{display:none}
@@ -274,20 +318,22 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
   .cats{margin-inline:-12px}
 }
 @media (max-width:360px){
-  .stat span{font-size:8.5px}
-  .stat b{font-size:19px}
+  .stat span{font-size:9.5px}
+  .stat b{font-size:20px}
 }
 
 .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translate(-50%,20px);opacity:0;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:600;font-size:14px;transition:opacity .25s,transform .25s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <div class="preview" id="previewNote" hidden>Preview with sample guests. Nothing here is saved. Once deployed with Apps Script, entries go to your Google Sheet.</div>
 
   <header class="top">
     <div class="art" id="art" aria-hidden="true"></div>
+    <canvas id="fx" aria-hidden="true"></canvas>
     <div class="eyebrow">Potluck · RSVP &amp; food sign-up</div>
     <h1 id="evName">Montebello Tamil Makkal - Deepavali Potluck</h1>
     <p class="meta" id="evMeta"></p>
@@ -295,8 +341,9 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
       <div class="stat"><b id="stFamilies">0</b><span>Families coming</span></div>
       <div class="stat"><b id="stAdults">0</b><span>Adults</span></div>
       <div class="stat"><b id="stKids">0</b><span>Kids</span></div>
+      <div class="stat"><b id="stVeg">0</b><span><i class="vm"></i> Veg guests</span></div>
+      <div class="stat"><b id="stNonveg">0</b><span><i class="vm nv"></i> Non-veg guests</span></div>
       <div class="stat"><b id="stMaybe">0</b><span>Maybe</span></div>
-      <div class="stat"><b id="stDishes">0</b><span>Dishes pledged</span></div>
     </div>
     <div class="themes" id="themes" role="group" aria-label="Color theme"></div>
   </header>
@@ -344,11 +391,12 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
           <div class="f party pair"><span class="lbl">Kids <span class="opt">under 12</span></span>
             <div class="stepper"><button type="button" data-step="-1" aria-label="One fewer kid">−</button><input type="number" id="kids" min="0" max="50" value="0" inputmode="numeric" aria-label="Kids"><button type="button" data-step="1" aria-label="One more kid">+</button></div></div>
 
-          <label class="f party"><span class="lbl">Food preference</span>
-            <select id="diet">
-              <option>Vegetarian</option><option>Non-vegetarian</option>
-            </select></label>
-          <label class="f party"><span class="lbl">Notes <span class="opt">optional</span></span>
+          <div class="f party pair"><span class="lbl"><span><i class="vm"></i> Veg eaters</span></span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="One fewer veg eater">−</button><input type="number" id="veg" min="0" max="100" value="2" inputmode="numeric" aria-label="Veg eaters"><button type="button" data-step="1" aria-label="One more veg eater">+</button></div></div>
+          <div class="f party pair"><span class="lbl"><span><i class="vm nv"></i> Non-veg eaters</span></span>
+            <div class="stepper"><button type="button" data-step="-1" aria-label="One fewer non-veg eater">−</button><input type="number" id="nonveg" min="0" max="100" value="0" inputmode="numeric" aria-label="Non-veg eaters"><button type="button" data-step="1" aria-label="One more non-veg eater">+</button></div></div>
+          <p class="hint full party" id="dietHint">Split your family of 2 between veg and non-veg.</p>
+          <label class="f party full"><span class="lbl">Notes <span class="opt">optional</span></span>
             <input type="text" id="notes" placeholder="Allergies, arriving late…"></label>
         </fieldset>
 
@@ -379,7 +427,14 @@ details.edit summary{cursor:pointer;font-weight:600;font-size:14px}
       </div>
 
       <div class="stack" style="gap:10px">
-        <h3>Coverage by course</h3>
+        <h3>Veg vs Non-veg</h3>
+        <div class="splits" id="vegSplit"></div>
+      </div>
+
+      <hr class="div">
+
+      <div class="stack" style="gap:10px">
+        <h3>Coverage by course <span class="h3n">· aim for 4+ dishes each</span></h3>
         <div class="cov" id="coverage"></div>
       </div>
 
@@ -409,7 +464,9 @@ const CONFIG = {
   when: 'Saturday, Oct 31 · 12 PM onward',
   where: 'Montebello Clubhouse',
   // GitHub Pages: paste your Apps Script Web app URL (ends in /exec). Leave '' inside Apps Script.
-  apiUrl: 'https://script.google.com/macros/s/AKfycbyrntl1lTIcftM2e9LYtrwkvSId8MWQMxljU0qw7akzpwbfpmQkcBgPoNNlYiz0sZSIDg/exec',
+  apiUrl: '',
+  maxServingsPerDish: 50,   // hard limit per dish; keep in sync with Code.gs
+  minDishesPerCourse: 4,    // suggested minimum per course; more is welcome
   palette: 'diya',          // diya | rangoli | peacock | kumkum | leaf
   showThemePicker: true,    // set false to hide the theme buttons from guests
 };
@@ -489,6 +546,97 @@ function drawArt(){
   </svg>`;
 }
 
+/* ===== Crackers: rockets that burst into sparks, plus a crackle of glitter ===== */
+function startCrackers(){
+  const cv = $('fx');
+  if(!cv || !cv.getContext || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const ctx = cv.getContext('2d');
+  let W = 0, H = 0, dpr = 1;
+  function size(){
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  size(); window.addEventListener('resize', size);
+
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const palette = () => [css('--leaf') || '#e8b443', css('--marigold') || '#ff8a3d', '#ffd36b', '#ff6b3d', '#fff2c4', '#ff4f9a', '#7fd8ff'];
+  const rockets = [], sparks = [];
+  const rnd = (a, b) => a + Math.random() * (b - a);
+
+  function launch(){
+    const cols = palette();
+    rockets.push({
+      x: rnd(W * .25, W * .92), y: H + 4,
+      vx: rnd(-.35, .35), vy: -rnd(H * .018, H * .024) - 3,
+      ty: rnd(H * .12, H * .42),
+      color: cols[Math.floor(Math.random() * cols.length)],
+      color2: cols[Math.floor(Math.random() * cols.length)],
+      kind: Math.random() < .3 ? 'ring' : 'peony'
+    });
+  }
+  function burst(r){
+    const n = r.kind === 'ring' ? 36 : Math.round(rnd(46, 64));
+    const sp = rnd(2.2, 3.4);
+    for(let i = 0; i < n; i++){
+      const a = (i / n) * Math.PI * 2 + rnd(-.05, .05);
+      const s = r.kind === 'ring' ? sp : sp * Math.sqrt(Math.random()) * 1.15;
+      sparks.push({ x: r.x, y: r.y, px: r.x, py: r.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+        life: 1, decay: rnd(.012, .02), color: i % 3 ? r.color : r.color2, w: rnd(1.2, 2.2), glitter: Math.random() < .25 });
+    }
+    // flash
+    sparks.push({ x: r.x, y: r.y, px: r.x, py: r.y, vx: 0, vy: 0, life: 1, decay: .08, color: '#fff6d8', w: 0, flash: true });
+  }
+
+  let last = 0, next = 400, raf = 0;
+  function frame(t){
+    raf = requestAnimationFrame(frame);
+    const dt = Math.min(48, t - (last || t)); last = t;
+    next -= dt;
+    if(next <= 0){ launch(); if(Math.random() < .35) setTimeout(launch, 180); next = rnd(1100, 2300); }
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    const k = dt / 16.7;
+
+    for(let i = rockets.length - 1; i >= 0; i--){
+      const r = rockets[i];
+      const ox = r.x, oy = r.y;
+      r.x += r.vx * k; r.y += r.vy * k; r.vy += .045 * k;
+      ctx.strokeStyle = r.color; ctx.lineWidth = 2; ctx.globalAlpha = .9;
+      ctx.beginPath(); ctx.moveTo(ox, oy + 6); ctx.lineTo(r.x, r.y); ctx.stroke();
+      // tail embers
+      if(Math.random() < .6) sparks.push({ x: r.x, y: r.y, px: r.x, py: r.y, vx: rnd(-.3, .3), vy: rnd(.2, .8), life: .6, decay: .04, color: '#ffb52e', w: 1 });
+      if(r.y <= r.ty || r.vy >= -.4){ burst(r); rockets.splice(i, 1); }
+    }
+
+    for(let i = sparks.length - 1; i >= 0; i--){
+      const s = sparks[i];
+      if(s.flash){
+        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 34);
+        g.addColorStop(0, 'rgba(255,246,216,' + (.55 * s.life) + ')'); g.addColorStop(1, 'rgba(255,200,90,0)');
+        ctx.globalAlpha = 1; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x, s.y, 34, 0, Math.PI * 2); ctx.fill();
+      } else {
+        s.px = s.x; s.py = s.y;
+        s.vx *= Math.pow(.975, k); s.vy = s.vy * Math.pow(.975, k) + .035 * k;
+        s.x += s.vx * k; s.y += s.vy * k;
+        let a = Math.max(0, s.life);
+        if(s.glitter && s.life < .5) a *= Math.random() < .5 ? 1 : .15;   // crackle
+        ctx.globalAlpha = a; ctx.strokeStyle = s.color; ctx.lineWidth = s.w; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(s.px, s.py); ctx.lineTo(s.x, s.y); ctx.stroke();
+      }
+      s.life -= s.decay * k;
+      if(s.life <= 0 || s.y > H + 10) sparks.splice(i, 1);
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  }
+  function play(){ if(!raf){ last = 0; raf = requestAnimationFrame(frame); } }
+  function pause(){ cancelAnimationFrame(raf); raf = 0; }
+  document.addEventListener('visibilitychange', () => document.hidden ? pause() : play());
+  play();
+}
+
 function initThemes(){
   let key = CONFIG.palette;
   if(CONFIG.showThemePicker){
@@ -514,16 +662,18 @@ const CATS = [
 const UNITS = { 'Servings':1, 'Pieces':0.5, 'Dozen':6, 'Half tray':15, 'Full tray':30, 'Litres':4 };
 const UNIT_HINT = { 'Pieces':'2 per person', 'Dozen':'≈6 servings', 'Half tray':'≈15 servings', 'Full tray':'≈30 servings', 'Litres':'≈4 cups' };
 const MAX_DISHES = 10;
+const MAX_SERVINGS = CONFIG.maxServingsPerDish || 50;
+const MIN_PER_COURSE = CONFIG.minDishesPerCourse || 4;
 
 /* ===== Data layer: Apps Script when deployed, in-memory sample data in preview ===== */
 const HAS_GAS = typeof google !== 'undefined' && google.script && google.script.run;
 const demo = (() => {
   const db = {
     rsvps:[
-      {id:'a1',name:'Ananya & Vikram R.',email:'ananya@example.com',phone:'',attending:'Yes',adults:2,kids:2,diet:'Vegetarian',notes:''},
-      {id:'b2',name:'Karthik & Divya',email:'karthik@example.com',phone:'',attending:'Yes',adults:2,kids:1,diet:'Non-vegetarian',notes:''},
-      {id:'c3',name:'Meera S.',email:'meera@example.com',phone:'',attending:'Maybe',adults:1,kids:0,diet:'Vegetarian',notes:''},
-      {id:'d4',name:'The Nair family',email:'nair@example.com',phone:'',attending:'Yes',adults:4,kids:2,diet:'Non-vegetarian',notes:''},
+      {id:'a1',name:'Ananya & Vikram R.',email:'ananya@example.com',phone:'',attending:'Yes',adults:2,kids:2,diet:'Vegetarian',veg:4,nonveg:0,notes:''},
+      {id:'b2',name:'Karthik & Divya',email:'karthik@example.com',phone:'',attending:'Yes',adults:2,kids:1,diet:'Mixed',veg:1,nonveg:2,notes:''},
+      {id:'c3',name:'Meera S.',email:'meera@example.com',phone:'',attending:'Maybe',adults:1,kids:0,diet:'Vegetarian',veg:1,nonveg:0,notes:''},
+      {id:'d4',name:'The Nair family',email:'nair@example.com',phone:'',attending:'Yes',adults:4,kids:2,diet:'Mixed',veg:2,nonveg:4,notes:''},
     ],
     dishes:[
       {id:'a1',category:'Rice & Breads',dish:'Veg Biryani',veg:'Veg',spice:'Medium',qty:1,unit:'Full tray',servings:30,notes:''},
@@ -536,7 +686,7 @@ const demo = (() => {
     ]
   };
   const pub = () => ({
-    rsvps: db.rsvps.map(r => ({id:r.id,name:r.name,attending:r.attending,adults:r.adults,kids:r.kids})),
+    rsvps: db.rsvps.map(r => ({id:r.id,name:r.name,attending:r.attending,adults:r.adults,kids:r.kids,diet:r.diet,veg:r.veg,nonveg:r.nonveg})),
     dishes: db.dishes.map(d => ({...d, name:(db.rsvps.find(r=>r.id===d.id)||{}).name}))
   });
   return {
@@ -551,7 +701,7 @@ const demo = (() => {
       const email = p.email.trim().toLowerCase();
       let r = db.rsvps.find(x => x.email === email);
       if(!r){ r = {id: Math.random().toString(36).slice(2,10)}; db.rsvps.push(r); }
-      Object.assign(r, {name:p.name, email, phone:p.phone, attending:p.attending, adults:+p.adults||0, kids:+p.kids||0, diet:p.diet, notes:p.notes});
+      Object.assign(r, {name:p.name, email, phone:p.phone, attending:p.attending, adults:+p.adults||0, kids:+p.kids||0, diet:p.diet, veg:+p.veg||0, nonveg:+p.nonveg||0, notes:p.notes});
       db.dishes = db.dishes.filter(d => d.id !== r.id);
       if(p.attending !== 'No') p.dishes.forEach(d => db.dishes.push({...d, id:r.id}));
       return {id:r.id, data:pub()};
@@ -608,7 +758,7 @@ function addDishRow(d = {}){
   const list = $('dishList');
   if(list.children.length >= MAX_DISHES) return;
   const n = ++rowSeq;
-  const cat = catOf(d.category || 'Mains · Veg');
+  const cat = catOf(d.category || openCourse());
   const el = document.createElement('div');
   el.className = 'dish';
   el.dataset.row = n;
@@ -616,8 +766,9 @@ function addDishRow(d = {}){
     <div class="dish-head"><span class="dish-num"></span>
       <button type="button" class="icon-btn rm" aria-label="Remove this dish">Remove</button></div>
     <div class="chips cats" role="group" aria-label="Course">
-      ${CATS.map(c => `<button type="button" class="chip" data-cat="${esc(c.key)}" aria-pressed="${c.key===cat.key}">${esc(c.key)}</button>`).join('')}
+      ${CATS.map(c => `<button type="button" class="chip" data-cat="${esc(c.key)}" aria-pressed="${c.key===cat.key}">${esc(c.key)}<span class="n cf"></span></button>`).join('')}
     </div>
+    <p class="hint catneed" hidden></p>
     <label class="f"><span class="lbl">Dish <span class="opt">pick from the list or type your own</span></span>
       <input type="text" id="dish-${n}-name" class="dname" list="dl-${CATS.indexOf(cat)}" placeholder="Start typing… e.g. ${esc(cat.dishes[0][0])}" value="${esc(d.dish||'')}" autocomplete="off"></label>
     <p class="dup" hidden></p>
@@ -626,7 +777,7 @@ function addDishRow(d = {}){
         <div class="stepper"><button type="button" data-step="-1" aria-label="Less">−</button><input type="number" id="dish-${n}-qty" class="qty" min="0" max="500" value="${d.qty != null ? d.qty : 1}" inputmode="decimal" aria-label="Quantity"><button type="button" data-step="1" aria-label="More">+</button></div></div>
       <label class="f"><span class="lbl">Unit</span>
         <select id="dish-${n}-unit" class="unit">${Object.keys(UNITS).map(u => `<option value="${u}">${u}${UNIT_HINT[u] ? ' ('+UNIT_HINT[u]+')' : ''}</option>`).join('')}</select></label>
-      <div class="serves">Serves about <b class="sv">0</b></div>
+      <div class="serves">Serves about <b class="sv">0</b> <span class="cap">(max ${MAX_SERVINGS})</span></div>
     </div>
     <div class="two">
       <div class="f"><span class="lbl">Type</span>
@@ -684,7 +835,50 @@ function readRow(el){
     notes: el.querySelector('.dnotes').value.trim()
   };
 }
+/* How many dishes each course already has: other guests' saved dishes + this form's named rows (except skipRow) */
+function courseCounts(skipRow){
+  const n = {};
+  board.dishes.forEach(d => { if(d.id !== myId) n[d.category] = (n[d.category]||0) + 1; });
+  [...$('dishList').children].forEach(el => {
+    if(el !== skipRow && el.querySelector('.dname').value.trim()) n[el.dataset.cat] = (n[el.dataset.cat]||0) + 1;
+  });
+  return n;
+}
+/* New dish rows start on the course that has the fewest dishes so far */
+function openCourse(){
+  const n = courseCounts(null);
+  const pref = ['Mains · Veg', ...CATS.map(c => c.key).filter(k => k !== 'Mains · Veg')];
+  return pref.reduce((best, k) => (n[k]||0) < (n[best]||0) ? k : best, pref[0]);
+}
+/* Chips show how many more dishes each course needs to reach the suggested minimum */
+function refreshChips(){
+  [...$('dishList').children].forEach(el => {
+    const n = courseCounts(el);
+    el.querySelectorAll('.cats .chip').forEach(b => {
+      const used = n[b.dataset.cat] || 0;
+      const need = Math.max(0, MIN_PER_COURSE - used);
+      b.classList.toggle('want', need > 0);
+      b.querySelector('.cf').textContent = need ? `needs ${need}` : '✓';
+    });
+    const used = n[el.dataset.cat] || 0;
+    const msg = el.querySelector('.catneed');
+    const short = CATS.filter(c => (n[c.key]||0) < MIN_PER_COURSE && c.key !== el.dataset.cat).map(c => c.key);
+    msg.hidden = used < MIN_PER_COURSE || !short.length;
+    if(!msg.hidden) msg.textContent = `${el.dataset.cat} already has ${used} dishes, which is great. ${short.slice(0, 3).join(', ')} still need${short.length === 1 ? 's' : ''} more if you can switch.`;
+  });
+}
+function capQty(el){
+  const unit = el.querySelector('.unit').value;
+  const q = el.querySelector('.qty');
+  const maxQ = Math.max(1, Math.floor(MAX_SERVINGS / (UNITS[unit] || 1)));
+  q.max = maxQ;
+  if((parseFloat(q.value) || 0) > maxQ){
+    q.value = maxQ;
+    toast(`Each dish can serve up to ${MAX_SERVINGS} people, so the max for ${unit.toLowerCase()} is ${maxQ}.`);
+  }
+}
 function updateRow(el){
+  capQty(el);
   const d = readRow(el);
   el.querySelector('.sv').textContent = d.servings;
   const dup = el.querySelector('.dup');
@@ -694,6 +888,7 @@ function updateRow(el){
     dup.hidden = false;
     dup.textContent = `${hit.name || 'Someone'} is already bringing ${hit.dish} (${fmt(hit.qty)} ${hit.unit.toLowerCase()}). You can still add it, or pick something the board is short on.`;
   } else dup.hidden = true;
+  refreshChips();
   updateSummary();
 }
 function renumber(){
@@ -714,12 +909,30 @@ function syncAttending(){
   document.querySelectorAll('.party').forEach(e => e.style.opacity = no ? .45 : 1);
   updateSummary();
 }
+/* Keep Veg + Non-veg equal to Adults + Kids. Party-size changes keep the non-veg count and adjust veg. */
+function syncDiet(src){
+  const total = (+$('adults').value || 0) + (+$('kids').value || 0);
+  let v = Math.max(0, parseInt($('veg').value, 10) || 0), n = Math.max(0, parseInt($('nonveg').value, 10) || 0);
+  if(src === 'veg'){ v = Math.min(v, total); n = total - v; }
+  else { n = Math.min(n, total); v = total - n; }
+  $('veg').value = v; $('nonveg').value = n;
+  $('veg').max = total; $('nonveg').max = total;
+  $('dietHint').textContent = total
+    ? `Split your family of ${total} between veg and non-veg.`
+    : 'Add adults or kids first, then split them between veg and non-veg.';
+}
+function dietOf(r){
+  if(r.veg != null || r.nonveg != null) return {veg: +r.veg || 0, nonveg: +r.nonveg || 0};
+  const t = (+r.adults || 0) + (+r.kids || 0);
+  return /^non/i.test(r.diet || '') ? {veg: 0, nonveg: t} : {veg: t, nonveg: 0};
+}
 function updateSummary(){
   if(attending() === 'No'){ $('partySummary').textContent = 'Sending regrets'; return; }
   const a = +$('adults').value || 0, k = +$('kids').value || 0;
+  const v = +$('veg').value || 0, n = +$('nonveg').value || 0;
   const ds = [...$('dishList').children].map(readRow).filter(d => d.dish);
   const sv = ds.reduce((s, d) => s + d.servings, 0);
-  $('partySummary').innerHTML = `<b>${a}</b> adult${a===1?'':'s'} · <b>${k}</b> kid${k===1?'':'s'} · <b>${ds.length}</b> dish${ds.length===1?'':'es'}${sv ? ` (~<b>${sv}</b> servings)` : ''}`;
+  $('partySummary').innerHTML = `<b>${a}</b> adult${a===1?'':'s'} · <b>${k}</b> kid${k===1?'':'s'} (<b>${v}</b> veg, <b>${n}</b> non-veg) · <b>${ds.length}</b> dish${ds.length===1?'':'es'}${sv ? ` (~<b>${sv}</b> servings)` : ''}`;
 }
 function fillForm(r){
   myId = r.id;
@@ -729,7 +942,9 @@ function fillForm(r){
   setRadio(document, 'attending', r.attending || 'Yes');
   $('adults').value = r.adults || 0;
   $('kids').value = r.kids || 0;
-  if(r.diet) $('diet').value = r.diet;
+  const dsplit = dietOf(r);
+  $('veg').value = dsplit.veg; $('nonveg').value = dsplit.nonveg;
+  syncDiet('nonveg');
   $('notes').value = r.notes || '';
   $('dishList').innerHTML = '';
   (r.dishes && r.dishes.length ? r.dishes : [{}]).forEach(d => addDishRow(d));
@@ -750,8 +965,9 @@ function loadBoard(attempt = 1){
     });
 }
 function renderPending(){
-  ['stFamilies','stAdults','stKids','stMaybe','stDishes','tabCount'].forEach(id => $(id).textContent = '…');
+  ['stFamilies','stAdults','stKids','stVeg','stNonveg','stMaybe','tabCount'].forEach(id => $(id).textContent = '…');
   $('headcountNote').textContent = '';
+  $('vegSplit').innerHTML = '';
   $('boardFilter').innerHTML = '';
   $('guests').innerHTML = '';
   $('claimed').innerHTML = '';
@@ -769,8 +985,29 @@ function render(){
   $('stAdults').textContent = adults;
   $('stKids').textContent = kids;
   $('stMaybe').textContent = maybe.length;
-  $('stDishes').textContent = board.dishes.length;
   $('tabCount').textContent = board.dishes.length;
+
+  // Veg vs non-veg: guests (confirmed, by food preference) and dishes (by type)
+  const ppl = r => (+r.adults||0) + (+r.kids||0);
+  const vegP = yes.reduce((s, r) => s + dietOf(r).veg, 0);
+  const nonP = yes.reduce((s, r) => s + dietOf(r).nonveg, 0);
+  $('stVeg').textContent = vegP;
+  $('stNonveg').textContent = nonP;
+  const vD = board.dishes.filter(d => d.veg !== 'Non-veg'), nD = board.dishes.filter(d => d.veg === 'Non-veg');
+  const sv = arr => arr.reduce((s, d) => s + (+d.servings||0), 0);
+  const vS = sv(vD), nS = sv(nD);
+  const bar = (a, b) => { const t = a + b; return t ? `<i class="v" style="width:${a/t*100}%"></i><i class="n" style="width:${b/t*100}%"></i>` : ''; };
+  $('vegSplit').innerHTML = `
+    <div class="split">
+      <div class="split-top"><span class="lab">Guests</span>
+        <span class="vals"><span><i class="vm"></i><b>${vegP}</b> veg</span><span><i class="vm nv"></i><b>${nonP}</b> non-veg</span></span></div>
+      <div class="sbar" role="img" aria-label="${vegP} veg guests, ${nonP} non-veg guests">${bar(vegP, nonP)}</div>
+    </div>
+    <div class="split">
+      <div class="split-top"><span class="lab">Dishes</span>
+        <span class="vals"><span><i class="vm"></i><b>${vD.length}</b> veg · ~${vS} servings</span><span><i class="vm nv"></i><b>${nD.length}</b> non-veg · ~${nS} servings</span></span></div>
+      <div class="sbar" role="img" aria-label="${vS} veg servings, ${nS} non-veg servings">${bar(vS, nS)}</div>
+    </div>`;
 
   // Expected eaters: confirmed + maybes; kids count as half
   const eaters = adults + kids*0.5 + sum(maybe,'adults') + sum(maybe,'kids')*0.5;
@@ -780,9 +1017,13 @@ function render(){
     const pledged = board.dishes.filter(d => d.category === c.key).reduce((s, d) => s + (+d.servings || 0), 0);
     const target = Math.max(1, Math.ceil(eaters * c.factor));
     const pct = Math.min(100, Math.round(pledged / target * 100));
-    const st = pct >= 100 ? ['ok','Covered'] : pct >= 50 ? ['mid','Getting there'] : ['need','Needed'];
+    const count = board.dishes.filter(d => d.category === c.key).length;
+    const slots = Array.from({length: MIN_PER_COURSE}, (_, i) => `<i class="${i < count ? 'on' : ''}"></i>`).join('')
+      + (count > MIN_PER_COURSE ? `<b class="extra">+${count - MIN_PER_COURSE}</b>` : '');
+    const need = MIN_PER_COURSE - count;
+    const st = need <= 0 ? ['ok', count + ' dishes ✓'] : count ? ['mid', `Needs ${need} more`] : ['need', `Needs ${need} dishes`];
     return `<div class="cov-row">
-      <div class="cov-top"><span class="name">${esc(c.key)}<span class="pill ${st[0]}">${st[1]}</span></span>
+      <div class="cov-top"><span class="name">${esc(c.key)}<span class="slots" role="img" aria-label="${count} dishes, suggested ${MIN_PER_COURSE} or more">${slots}</span><span class="pill ${st[0]}">${st[1]}</span></span>
         <span class="num">${pledged} / ${target} servings</span></div>
       <div class="bar ${st[0]==='ok'?'ok':''}" role="img" aria-label="${esc(c.key)}: ${pct}% covered"><i style="width:${pct}%"></i></div>
     </div>`;
@@ -807,7 +1048,8 @@ function render(){
 
   const going = [...yes, ...maybe];
   $('guests').innerHTML = going.length ? going.map(r =>
-    `<span class="guest ${r.attending==='Maybe'?'maybe':''}">${esc(r.name)} · <b>${(+r.adults||0)+(+r.kids||0)}</b>${r.attending==='Maybe'?' (maybe)':''}</span>`).join('')
+    { const dv = dietOf(r);
+      return `<span class="guest ${r.attending==='Maybe'?'maybe':''}">${esc(r.name)} · <b>${(+r.adults||0)+(+r.kids||0)}</b>${r.attending==='Maybe'?' (maybe)':''}<span class="gd">${dv.veg ? `<i class="vm"></i>${dv.veg}` : ''}${dv.nonveg ? `<i class="vm nv"></i>${dv.nonveg}` : ''}</span></span>`; }).join('')
     : '<p class="empty">No RSVPs yet.</p>';
 
   [...$('dishList').children].forEach(updateRow);
@@ -846,11 +1088,12 @@ document.addEventListener('click', e => {
     return;
   }
   const rm = e.target.closest('.rm');
-  if(rm){ rm.closest('.dish').remove(); renumber(); updateSummary(); return; }
+  if(rm){ rm.closest('.dish').remove(); renumber(); refreshChips(); updateSummary(); return; }
   const f = e.target.closest('[data-filter]');
   if(f){ filter = f.dataset.filter; render(); }
 });
 document.addEventListener('input', e => {
+  if(['adults','kids','veg','nonveg'].includes(e.target.id)) syncDiet(e.target.id);
   const row = e.target.closest('.dish');
   if(row){
     if(e.target.classList.contains('dname')){
@@ -888,12 +1131,16 @@ $('rsvpForm').addEventListener('submit', e => {
     id: myId || '',
     name: $('name').value.trim(), email: $('email').value.trim(), phone: $('phone').value.trim(),
     attending: attending(), adults: +$('adults').value || 0, kids: +$('kids').value || 0,
-    diet: $('diet').value, notes: $('notes').value.trim(),
+    veg: +$('veg').value || 0, nonveg: +$('nonveg').value || 0,
+    diet: (+$('veg').value && +$('nonveg').value) ? 'Mixed' : (+$('nonveg').value ? 'Non-vegetarian' : 'Vegetarian'),
+    notes: $('notes').value.trim(),
     dishes: attending() === 'No' ? [] : [...$('dishList').children].map(readRow).filter(d => d.dish)
   };
   if(!payload.name){ showErr('Please enter your name.'); $('name').focus(); toast('Please enter your name.'); return; }
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(payload.email)){ showErr('Please enter a valid email. It is how you edit your RSVP later.'); $('email').focus(); toast('Please enter a valid email.'); return; }
   if(payload.attending !== 'No' && payload.adults + payload.kids === 0){ showErr('Add at least one adult or kid to your party.'); return; }
+  const big = payload.dishes.find(d => d.servings > MAX_SERVINGS);
+  if(big){ const m = `${big.dish} is set for ${big.servings} servings. Each dish can serve at most ${MAX_SERVINGS} people.`; showErr(m); toast(m); return; }
   const btn = $('submitBtn'); const was = btn.textContent;
   btn.disabled = true; btn.textContent = 'Saving…';
   api('submitRsvp', payload).then(res => {
@@ -902,7 +1149,11 @@ $('rsvpForm').addEventListener('submit', e => {
     btn.textContent = 'Update RSVP';
     toast(LIVE ? 'RSVP saved to the sheet. Thank you!' : 'Saved in this preview only');
     if(isPhone() && payload.attending !== 'No') setView('board');
-  }).catch(err => { showErr(err.message || 'Could not save. Please try again.'); btn.textContent = was; })
+  }).catch(err => {
+    const m = err.message || 'Could not save. Please try again.';
+    showErr(m); toast(m); btn.textContent = was;
+    loadBoard(3);   // someone may have just filled a course; refresh the board and the Full markers
+  })
     .finally(() => { btn.disabled = false; });
 });
 
@@ -913,10 +1164,14 @@ document.title = CONFIG.eventName + ' RSVP';
 $('previewNote').hidden = LIVE;
 initThemes();
 drawArt();
+startCrackers();
 buildDatalists();
 addDishRow({category:'Mains · Veg'});
+syncDiet('nonveg');
 syncAttending();
 render();
 loadBoard();
 if(LIVE) setInterval(() => loadBoard(3), 60000);
 </script>
+</body>
+</html>
