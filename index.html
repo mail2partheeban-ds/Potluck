@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="RSVP and sign up for a dish for the Montebello Tamil Makkal Deepavali Potluck.">
 <meta name="theme-color" content="#0a0907">
-<title>Montebello Tamil Makkal Deepavali Potluck RSVP</title>
+<title>Montebelllo Tamil Makkal Deepavali Potluck RSVP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
@@ -922,8 +922,12 @@ function syncDiet(src){
     : 'Add adults or kids first, then split them between veg and non-veg.';
 }
 function dietOf(r){
-  if(r.veg != null || r.nonveg != null) return {veg: +r.veg || 0, nonveg: +r.nonveg || 0};
   const t = (+r.adults || 0) + (+r.kids || 0);
+  if(r.veg != null || r.nonveg != null){
+    let v = +r.veg || 0, n = +r.nonveg || 0;
+    if(v + n !== t){ v = Math.min(v, t); n = t - v; }   // always adds up to the party size
+    return {veg: v, nonveg: n};
+  }
   return /^non/i.test(r.diet || '') ? {veg: 0, nonveg: t} : {veg: t, nonveg: 0};
 }
 function updateSummary(){
@@ -1007,7 +1011,8 @@ function render(){
       <div class="split-top"><span class="lab">Dishes</span>
         <span class="vals"><span><i class="vm"></i><b>${vD.length}</b> veg · ~${vS} servings</span><span><i class="vm nv"></i><b>${nD.length}</b> non-veg · ~${nS} servings</span></span></div>
       <div class="sbar" role="img" aria-label="${vS} veg servings, ${nS} non-veg servings">${bar(vS, nS)}</div>
-    </div>`;
+    </div>
+    <p class="hint">Guest counts include confirmed (Yes) families only: ${vegP} veg + ${nonP} non-veg = ${vegP + nonP}, matching ${adults} adults + ${kids} kids.${maybe.length ? ` Maybes would add ${maybe.reduce((s, r) => s + dietOf(r).veg, 0)} veg and ${maybe.reduce((s, r) => s + dietOf(r).nonveg, 0)} non-veg.` : ''}</p>`;
 
   // Expected eaters: confirmed + maybes; kids count as half
   const eaters = adults + kids*0.5 + sum(maybe,'adults') + sum(maybe,'kids')*0.5;
